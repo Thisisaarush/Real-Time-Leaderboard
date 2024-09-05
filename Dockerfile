@@ -1,11 +1,19 @@
-FROM node:20-alpine
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --only=production
 
 COPY . .
 
+# Development stage 
+FROM base AS development
+RUN npm install
 EXPOSE 5000
-CMD [ "node", "index.js" ]
+CMD ["npm", "run", "dev"]
+
+# Production stage
+FROM base AS production
+EXPOSE 5000
+CMD ["npm", "start"]
